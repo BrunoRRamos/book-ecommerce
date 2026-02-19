@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export const Header = () => {
   return (
-    <header className="flex items-center justify-between px2 py-4 m-1 bg-white shadow-md rounded">
+    <header className="flex items-center justify-between px-2 py-4 m-1 bg-white shadow-md rounded">
       <div className="flex justify-between pl-5 gap-4">
         <Menu color="#666869" strokeWidth={2} />
         <Link href="/">
