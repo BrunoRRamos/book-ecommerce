@@ -2,7 +2,6 @@
 
 import { Rate, Button } from "antd";
 import { ShoppingCart, Heart, HeartPlus } from "lucide-react";
-import { useState } from "react";
 
 type CardProps = {
   productName: string;
@@ -10,6 +9,8 @@ type CardProps = {
   qnt_reviews: number;
   avarage_rating: number;
   productImage?: string;
+  favorites: string[];
+  toggleFavorite: (id: string) => void;
 };
 
 export function Card(props: CardProps) {
@@ -19,13 +20,9 @@ export function Card(props: CardProps) {
     qnt_reviews,
     avarage_rating,
     productImage,
+    favorites,
+    toggleFavorite,
   } = props;
-
-  const [isFavorited, setIsFavorited] = useState(false);
-
-  const toggleFavorite = () => {
-    setIsFavorited(!isFavorited);
-  };
 
   return (
     <div className="m-1 w-full max-w-xs bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
@@ -49,10 +46,10 @@ export function Card(props: CardProps) {
             </p>
           </div>
           <span
-            onClick={() => toggleFavorite()}
+            onClick={() => toggleFavorite(productName)}
             className="cursor-pointer bg-slate-100 p-3 rounded-full"
           >
-            {isFavorited ? (
+            {favorites.includes(productName) ? (
               <Heart className="text-red-500" fill="currentColor" />
             ) : (
               <HeartPlus />

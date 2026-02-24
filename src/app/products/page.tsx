@@ -1,5 +1,6 @@
 "use client";
 
+import { useFavorites } from "@/src/hooks/useFavorites";
 import { Card } from "../../components/card";
 import { Pagination } from "antd";
 import { useState } from "react";
@@ -74,12 +75,14 @@ export default function Products() {
   const startIndex = (currentPage - 1) * pageSize;
   const endIndex = startIndex + pageSize;
   const currentData = cardPropsList.slice(startIndex, endIndex);
+  const { toggleFavorite, favorites } = useFavorites();
+
 
   return (
     <main className="flex flex-col gap-8 justify-center items-center p-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 p-2 w-full auto-rows-max">
         {currentData.map((props, index) => (
-          <Card key={index} {...props} />
+          <Card key={index} {...props} favorites={favorites} toggleFavorite={toggleFavorite}/>
         ))}
       </div>
 
