@@ -15,13 +15,13 @@ export const Header = () => {
       <nav className="self-end">
         <ul className="flex justify-end gap-4 font-bold poiter flex-wrap">
           <li>
-            <Link href={"/products"}>Produtos</Link>
+            <Link className="hover:text-blue-500" href={"/products"}>Produtos</Link>
           </li>
           <li>
-            <Link href={"/onsale"}>Promoções</Link>
+            <Link className="hover:text-blue-500" href={"/onsale"}>Promoções</Link>
           </li>
           <li>
-            <Link href={"/spoted"}>Destaques</Link>
+            <Link className="hover:text-blue-500" href={"/spoted"}>Destaques</Link>
           </li>
         </ul>
       </nav>
@@ -29,7 +29,7 @@ export const Header = () => {
       <Flex gap={10}>
         <ul className="flex flex-row gap-10 pr-5">
           <li>
-            <Link href="/carrinho">
+            <Link href="/cart">
               <ShoppingCart />
             </Link>
           </li>

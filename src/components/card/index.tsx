@@ -2,21 +2,12 @@
 
 import { Rate, Button } from "antd";
 import { ShoppingCart, Heart, HeartPlus } from "lucide-react";
-
-interface CardProps {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  image: string;
-  qnt_reviews: number;
-  avarage_rating: number;
-  favorites: string[];
-  toggleFavorite: (id: string) => void;
-};
+import { CardProps, CartItem } from "@/src/types/types";
+import { formatCurrency } from "@/src/utils/utils";
 
 export function Card(props: CardProps) {
   const {
+    id,
     title,
     price,
     qnt_reviews,
@@ -24,16 +15,21 @@ export function Card(props: CardProps) {
     image,
     favorites,
     toggleFavorite,
+    addItemToCart,
+    isIntoCart
   } = props;
+
+  const item: CartItem = {
+    id: id,
+    title: title,
+    price: price,
+    quantity: 1,
+  } as CartItem;
 
   return (
     <div className="m-1 w-full max-w-xs bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
       <div className="w-full aspect-square overflow-hidden">
-        <img
-          src={image}
-          alt={title}
-          className="w-full h-full object-fill"
-        />
+        <img src={image} alt={title} className="w-full h-full object-fill" />
       </div>
 
       <div className="p-4 flex flex-col gap-3">
@@ -43,9 +39,7 @@ export function Card(props: CardProps) {
               {title}
             </h3>
 
-            <p className="text-lg text-gray-900">
-              R$ {price.toFixed(2).replace(".", ",")}
-            </p>
+            <p className="text-lg text-gray-900">{formatCurrency(price)}</p>
           </div>
           <span
             onClick={() => toggleFavorite(title)}
@@ -73,6 +67,7 @@ export function Card(props: CardProps) {
           type="primary"
           icon={<ShoppingCart size={16} />}
           className="w-full h-10"
+          onClick={() => isIntoCart(id) ? "" : addItemToCart(item)}
           block
         >
           Adicionar ao carrinho

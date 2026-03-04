@@ -1,32 +1,53 @@
-import { useEffect, useState } from "react";
+"use client";
 
-interface CartItem {
-  id: number;
-  title: string;
-  price: number;
-}
+import { useEffect, useState } from "react";
+import { CartItem } from "../types/types";
 
 export function useCart() {
-  const [cartItens, setCartItem] = useState<CartItem[]>([]);
+  const [cartItems, setCartItem] = useState<CartItem[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    const storedData = localStorage.getItem("cartItens");
-    if (storedData) {
-      setCartItem(JSON.parse(storedData));
-    }
+    const storedData = localStorage.getItem("cartItems");
+    setCartItem(storedData ? JSON.parse(storedData) : []);
+    setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("cartItens", JSON.stringify(cartItens));
-  }, [cartItens]);
+    if (!isMounted) return;
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems, isMounted]);
 
-  const addItemToCart = (item: CartItem) => {
-    setCartItem((prev) => 
-        !prev.includes(item)
-        ? [...prev, item]
-        : prev
+  const removeItem = (id: number, items: CartItem[]): CartItem[] => {
+    return items.filter((i) => i.id !== id);
+  };
+
+  const setItemQuantity = (id: number, quantity: number) => {
+    setCartItem((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, quantity } : item)),
     );
   };
 
-  return { cartItens, addItemToCart}
+  const isIntoCart = (id: number): boolean => {
+    return cartItems.some((i) => i.id === id);
+  };
+
+  const removeCartItem = (id: number) => {
+    setCartItem(removeItem(id, cartItems));
+  };
+
+  const addItemToCart = (item: CartItem) => {
+    setCartItem((prev) =>
+      !prev.some((i) => i.id === item.id) ? [...prev, item] : prev,
+    );
+  };
+
+  return {
+    cartItems,
+    isMounted,
+    addItemToCart,
+    setItemQuantity,
+    isIntoCart,
+    removeCartItem,
+  };
 }

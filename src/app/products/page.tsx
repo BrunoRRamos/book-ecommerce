@@ -5,19 +5,15 @@ import { Card } from "../../components/card";
 import { Pagination } from "antd";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Product } from "@/src/types/types";
+import { useCart } from "@/src/hooks/useCart";
 
-interface Product {
-  id: number;
-  title: string;
-  price: number;
-  description: string;
-  image: string;
-}
 // Dados MOCADOS COM API (SUBSTITUIR POR API PROPIA)
 const fetchProducts = async (): Promise<Product[]> => {
-  return await axios.get('https://fakestoreapi.com/products')
-    .then(response => response.data);
-}
+  return await axios
+    .get("https://fakestoreapi.com/products")
+    .then((response) => response.data);
+};
 
 const cardPropsList = [
   {
@@ -91,6 +87,7 @@ export default function Products() {
   const endIndex = startIndex + pageSize;
   const currentData = products.slice(startIndex, endIndex);
   const { toggleFavorite, favorites } = useFavorites();
+  const { addItemToCart, isIntoCart } = useCart();
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -104,12 +101,20 @@ export default function Products() {
     loadProducts();
   }, []);
 
-
   return (
     <main className="flex flex-col gap-8 justify-center items-center p-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 p-2 w-full auto-rows-max">
         {currentData.map((props, index) => (
-          <Card qnt_reviews={0} avarage_rating={0} key={index} {...props} favorites={favorites} toggleFavorite={toggleFavorite}/>
+          <Card
+            qnt_reviews={0}
+            avarage_rating={0}
+            key={index}
+            {...props}
+            favorites={favorites}
+            toggleFavorite={toggleFavorite}
+            addItemToCart={addItemToCart}
+            isIntoCart={isIntoCart}
+          />
         ))}
       </div>
 
