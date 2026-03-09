@@ -1,5 +1,5 @@
 import { ShoppingCart, UserRound, Menu } from "lucide-react";
-import { Flex } from "antd";
+import { Divider, Flex } from "antd";
 import Link from "next/link";
 
 export const Header = () => {
@@ -10,21 +10,13 @@ export const Header = () => {
         <Link href="/">
           <p className="font-bold text-gray-800">AI Books E-commerce</p>
         </Link>
-      </div>
 
-      <nav className="self-end">
-        <ul className="flex justify-end gap-4 font-bold poiter flex-wrap">
-          <li>
-            <Link className="hover:text-blue-500" href={"/products"}>Produtos</Link>
-          </li>
-          <li>
-            <Link className="hover:text-blue-500" href={"/onsale"}>Promoções</Link>
-          </li>
-          <li>
-            <Link className="hover:text-blue-500" href={"/spoted"}>Destaques</Link>
-          </li>
-        </ul>
-      </nav>
+        <Divider orientation="vertical" className="self-center" style={{borderColor: '#000000'}}/>
+
+        <Link className="hover:text-blue-500 bold" href={"/products"}>
+          Produtos
+        </Link>
+      </div>
 
       <Flex gap={10}>
         <ul className="flex flex-row gap-10 pr-5">
