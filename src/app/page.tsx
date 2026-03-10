@@ -1,12 +1,15 @@
 import { Metadata } from "next";
+import HomeClient from "./homepage/homePage";
 
 export const metadata: Metadata = {
-  title: "Book E-Commerce",
-  description: "Sua loja online de livros - Encontre os melhores títulos, autores renomados e ofertas imperdíveis.",
+  title: "AI Store",
+  description:
+    "Sua loja online - Encontre os melhores produtos com ótimos preços e ofertas exclusivas.",
   openGraph: {
-    title: "Book E-Commerce",
-    description: "Sua loja online de livros - Encontre os melhores títulos, autores renomados e ofertas imperdíveis.",
-    siteName: "Book E-Commerce",
+    title: "AI Store",
+    description:
+      "Sua loja online - Encontre os melhores produtos com ótimos preços e ofertas exclusivas.",
+    siteName: "AI Store",
     locale: "pt_BR",
     type: "website",
   },
@@ -18,14 +21,9 @@ export const metadata: Metadata = {
       index: true,
       follow: true,
     },
-  }
+  },
 };
 
-
 export default function Home() {
-  return (
-    <main>
-      <h1>Home</h1>
-    </main>
-  );
+  return <HomeClient />;
 }
