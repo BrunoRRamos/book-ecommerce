@@ -8,7 +8,7 @@ export const Header = () => {
       <div className="flex justify-between pl-5 gap-4">
         <Menu color="#666869" strokeWidth={2} />
         <Link href="/">
-          <p className="font-bold text-gray-800">AI Books E-commerce</p>
+          <p className="font-bold text-gray-800">AI Store</p>
         </Link>
 
         <Divider orientation="vertical" className="self-center" style={{borderColor: '#000000'}}/>
