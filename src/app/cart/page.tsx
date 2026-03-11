@@ -70,6 +70,17 @@ async function buscarCoordenadasPorCidade(
   }
 }
 
+const handleCheckout = async (total: number) => {
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ total }),
+    });
+
+    const { url } = await res.json();
+    window.location.href = url;
+  };
+
 export default function CartPage() {
   const { cartItems, setItemQuantity, removeCartItem, clearCart } = useCart();
   const [total, setTotal] = useState<number>(0);
@@ -201,6 +212,7 @@ export default function CartPage() {
                   quantity: i.quantity,
                 })),
               });
+              handleCheckout(total);
               clearCart();
               notification.success({
                 title: "Pedido realizado",
