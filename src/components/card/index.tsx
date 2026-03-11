@@ -82,7 +82,7 @@ export function Card(props: CardProps) {
   }, [notifyType]);
 
   return (
-    <div className="m-1 w-full max-w-xs bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+    <div className="m-1 w-full max-w-xs bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200 flex flex-col h-full">
       {contextHolder}
       <Link href={`/products/${id}`} className="block">
         <div className="w-full aspect-square overflow-hidden">
@@ -94,7 +94,7 @@ export function Card(props: CardProps) {
         </div>
       </Link>
 
-      <div className="p-4 flex flex-col gap-3">
+      <div className="p-4 flex flex-col gap-3 flex-1">
         <div className="flex justify-between items-start gap-2">
           <Link
             href={`/products/${id}`}
@@ -134,10 +134,6 @@ export function Card(props: CardProps) {
                 {descricao}
               </p>
             )}
-            <p className="mt-2 text-xs text-gray-600">Estoque: {estoque}</p>
-            <p className="mt-2 text-lg font-semibold text-gray-900">
-              {formatCurrency(preco)}
-            </p>
           </Link>
           <span
             onClick={() => toggleFavorite(id)}
@@ -151,67 +147,76 @@ export function Card(props: CardProps) {
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Rate
-            disabled
-            allowHalf
-            value={avarage_rating}
-            style={{ fontSize: "14px" }}
-          />
-          <span className="text-xs text-gray-600">({qnt_reviews})</span>
-        </div>
+        <div className="mt-auto flex flex-col gap-2">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-gray-600">Estoque: {estoque}</p>
+            <p className="text-lg font-semibold text-gray-900">
+              {formatCurrency(preco)}
+            </p>
+          </div>
 
-        {onEdit || onDelete ? (
           <div className="flex items-center gap-2">
-            <div className="flex-1">
-              <Tooltip title="Adicionar ao carrinho">
-                <Button
-                  type="primary"
-                  icon={<ShoppingCart size={16} />}
-                  className="w-full h-10 flex items-center justify-center"
-                  onClick={() => onAddItem(id)}
-                  block
-                />
-              </Tooltip>
-            </div>
+            <Rate
+              disabled
+              allowHalf
+              value={avarage_rating}
+              style={{ fontSize: "14px" }}
+            />
+            <span className="text-xs text-gray-600">({qnt_reviews})</span>
+          </div>
+
+          {onEdit || onDelete ? (
             <div className="flex items-center gap-2">
-              <Tooltip title="Editar">
-                <Button
-                  disabled={!onEdit}
-                  onClick={() => onEdit?.(id)}
-                  icon={<Pencil size={16} />}
-                />
-              </Tooltip>
-              <Popconfirm
-                title="Excluir produto?"
-                description="Essa ação não pode ser desfeita."
-                okText="Excluir"
-                cancelText="Cancelar"
-                okButtonProps={{ danger: true }}
-                onConfirm={() => onDelete?.(id)}
-                disabled={!onDelete}
-              >
-                <Tooltip title="Excluir">
+              <div className="flex-1">
+                <Tooltip title="Adicionar ao carrinho">
                   <Button
-                    danger
-                    disabled={!onDelete}
-                    icon={<Trash2 size={16} />}
+                    type="primary"
+                    icon={<ShoppingCart size={16} />}
+                    className="w-full h-10 flex items-center justify-center"
+                    onClick={() => onAddItem(id)}
+                    block
                   />
                 </Tooltip>
-              </Popconfirm>
+              </div>
+              <div className="flex items-center gap-2">
+                <Tooltip title="Editar">
+                  <Button
+                    disabled={!onEdit}
+                    onClick={() => onEdit?.(id)}
+                    icon={<Pencil size={16} />}
+                  />
+                </Tooltip>
+                <Popconfirm
+                  title="Excluir produto?"
+                  description="Essa ação não pode ser desfeita."
+                  okText="Excluir"
+                  cancelText="Cancelar"
+                  okButtonProps={{ danger: true }}
+                  onConfirm={() => onDelete?.(id)}
+                  disabled={!onDelete}
+                >
+                  <Tooltip title="Excluir">
+                    <Button
+                      danger
+                      disabled={!onDelete}
+                      icon={<Trash2 size={16} />}
+                    />
+                  </Tooltip>
+                </Popconfirm>
+              </div>
             </div>
-          </div>
-        ) : (
-          <Tooltip title="Adicionar ao carrinho">
-            <Button
-              type="primary"
-              icon={<ShoppingCart size={16} />}
-              className="w-full h-10 flex items-center justify-center"
-              onClick={() => onAddItem(id)}
-              block
-            />
-          </Tooltip>
-        )}
+          ) : (
+            <Tooltip title="Adicionar ao carrinho">
+              <Button
+                type="primary"
+                icon={<ShoppingCart size={16} />}
+                className="w-full h-10 flex items-center justify-center"
+                onClick={() => onAddItem(id)}
+                block
+              />
+            </Tooltip>
+          )}
+        </div>
       </div>
     </div>
   );
