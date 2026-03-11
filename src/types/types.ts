@@ -14,6 +14,8 @@ export interface CardProps {
   preco: number;
   descricao: string;
   imagem: string;
+  categoria: string;
+  tags: string[];
   qnt_reviews: number;
   avarage_rating: number;
   favorites: number[];
