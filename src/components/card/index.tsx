@@ -1,7 +1,15 @@
 "use client";
 
-import { Rate, Button, notification, Popconfirm } from "antd";
-import { ShoppingCart, Heart, HeartPlus } from "lucide-react";
+import { Rate, Button, notification, Popconfirm, Tag, Tooltip } from "antd";
+import {
+  ShoppingCart,
+  Heart,
+  HeartPlus,
+  Pencil,
+  Trash2,
+  Tag as TagIcon,
+  Tags as TagsIcon,
+} from "lucide-react";
 import { CardProps, CartItem, NotificationType } from "@/src/types/types";
 import { formatCurrency } from "@/src/utils/utils";
 import { openNotificationWithIcon } from "@/src/utils/mesagesTemplate";
@@ -16,6 +24,9 @@ export function Card(props: CardProps) {
     id,
     nome,
     preco,
+    descricao,
+    categoria,
+    tags,
     qnt_reviews,
     avarage_rating,
     imagem,
@@ -87,7 +98,40 @@ export function Card(props: CardProps) {
             <h3 className="font-bold text-xl line-clamp-2 text-gray-900">
               {nome}
             </h3>
-            <p className="text-lg text-gray-900">{formatCurrency(preco)}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-600">
+              <span className="inline-flex items-center gap-1">
+                <TagIcon className="w-3 h-3 text-gray-500" />
+                <span className="font-medium">Categoria:</span>
+              </span>
+              <Tag className="m-0" color="blue">
+                {categoria}
+              </Tag>
+            </div>
+            {tags?.length ? (
+              <div className="mt-1 flex flex-wrap items-center gap-1 text-xs">
+                <TagsIcon className="w-3 h-3 text-gray-500 mr-1" />
+                {tags.slice(0, 3).map((t) => (
+                  <Tag key={t} className="m-0" color="geekblue">
+                    {t}
+                  </Tag>
+                ))}
+                {tags.length > 3 && (
+                  <span className="text-xs text-gray-500">
+                    +{tags.length - 3}
+                  </span>
+                )}
+              </div>
+            ) : (
+              <span className="mt-1 text-xs text-gray-500">Sem tags</span>
+            )}
+            {descricao && (
+              <p className="mt-2 text-sm text-gray-700 line-clamp-3">
+                {descricao}
+              </p>
+            )}
+            <p className="mt-2 text-lg font-semibold text-gray-900">
+              {formatCurrency(preco)}
+            </p>
           </Link>
           <span
             onClick={() => toggleFavorite(id)}
@@ -111,39 +155,56 @@ export function Card(props: CardProps) {
           <span className="text-xs text-gray-600">({qnt_reviews})</span>
         </div>
 
-        <Button
-          type="primary"
-          icon={<ShoppingCart size={16} />}
-          className="w-full h-10"
-          onClick={() => onAddItem(id)}
-          block
-        >
-          Adicionar ao carrinho
-        </Button>
-
-        {(onEdit || onDelete) && (
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              disabled={!onEdit}
-              onClick={() => onEdit?.(id)}
-              block
-            >
-              Editar
-            </Button>
-            <Popconfirm
-              title="Excluir produto?"
-              description="Essa ação não pode ser desfeita."
-              okText="Excluir"
-              cancelText="Cancelar"
-              okButtonProps={{ danger: true }}
-              onConfirm={() => onDelete?.(id)}
-              disabled={!onDelete}
-            >
-              <Button danger disabled={!onDelete} block>
-                Excluir
-              </Button>
-            </Popconfirm>
+        {onEdit || onDelete ? (
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <Tooltip title="Adicionar ao carrinho">
+                <Button
+                  type="primary"
+                  icon={<ShoppingCart size={16} />}
+                  className="w-full h-10 flex items-center justify-center"
+                  onClick={() => onAddItem(id)}
+                  block
+                />
+              </Tooltip>
+            </div>
+            <div className="flex items-center gap-2">
+              <Tooltip title="Editar">
+                <Button
+                  disabled={!onEdit}
+                  onClick={() => onEdit?.(id)}
+                  icon={<Pencil size={16} />}
+                />
+              </Tooltip>
+              <Popconfirm
+                title="Excluir produto?"
+                description="Essa ação não pode ser desfeita."
+                okText="Excluir"
+                cancelText="Cancelar"
+                okButtonProps={{ danger: true }}
+                onConfirm={() => onDelete?.(id)}
+                disabled={!onDelete}
+              >
+                <Tooltip title="Excluir">
+                  <Button
+                    danger
+                    disabled={!onDelete}
+                    icon={<Trash2 size={16} />}
+                  />
+                </Tooltip>
+              </Popconfirm>
+            </div>
           </div>
+        ) : (
+          <Tooltip title="Adicionar ao carrinho">
+            <Button
+              type="primary"
+              icon={<ShoppingCart size={16} />}
+              className="w-full h-10 flex items-center justify-center"
+              onClick={() => onAddItem(id)}
+              block
+            />
+          </Tooltip>
         )}
       </div>
     </div>
