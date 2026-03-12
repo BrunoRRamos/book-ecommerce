@@ -75,9 +75,3 @@ export interface SessionData {
     quantity: number | null;
   }[];
 }
-
-export interface PendingOrder {
-  items: CartItem[];
-  total: number;
-  frete: { servico: string; prazo: string; preco: number } | null;
-}

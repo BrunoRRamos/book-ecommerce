@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/src/hooks/useCart";
-import { createOrder } from "@/src/lib/ordersRepo";
-import { decrementInventory, ensureSeededProducts } from "@/src/lib/productsRepo";
-import { CartItem, PendingOrder, SessionData } from "@/src/types/types";
+import { SessionData } from "@/src/types/types";
 import Link from "next/link";
 
 
@@ -24,47 +22,20 @@ export default function SuccessPage() {
   const [fulfilled, setFulfilled] = useState(false);
   const [visible, setVisible] = useState(false);
 
+  const fulfilledRef = useRef(false);
+
   useEffect(() => {
-    if (!sessionId) { setLoading(false); return; }
-
-    async function fulfill() {
-      try {
-        const res = await fetch(`/api/checkout/verify?session_id=${sessionId}`);
-        const json: SessionData = await res.json();
-        setData(json);
-
-        if (json.status === "paid" && !fulfilled) {
-          const raw = localStorage.getItem("pendingOrder");
-          if (raw) {
-            const pending: PendingOrder = JSON.parse(raw);
-            ensureSeededProducts();
-            decrementInventory(
-              pending.items.map((i) => ({ productId: i.id, quantity: i.quantity }))
-            );
-            createOrder({
-              createdAt: new Date().toISOString(),
-              total: pending.total,
-              items: pending.items.map((i) => ({
-                productId: i.id,
-                nome: i.nome,
-                preco: i.preco,
-                quantity: i.quantity,
-              })),
-            });
-            localStorage.removeItem("pendingOrder");
-            clearCart();
-            setFulfilled(true);
-          }
-        }
-      } catch (e) {
-        console.error(e);
-      } finally {
+    if (!sessionId || fulfilledRef.current) return;
+    fulfilledRef.current = true;
+  
+    fetch(`/api/checkout/verify?session_id=${sessionId}`)
+      .then((res) => res.json())
+      .then((json: SessionData) => setData(json))
+      .catch(console.error)
+      .finally(() => {
         setLoading(false);
         setTimeout(() => setVisible(true), 80);
-      }
-    }
-
-    fulfill();
+      });
   }, [sessionId]);
 
   if (loading) {
