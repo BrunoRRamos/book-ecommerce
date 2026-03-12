@@ -43,7 +43,7 @@ export function emailConfirmacao({
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#111">
         <h2 style="color:#2563eb">Pedido confirmado!</h2>
-        <p>Olá${customerName ? `, <strong>${customerName}</strong>` : ""}! Seu pagamento foi aprovado com sucesso.</p>
+        <p>Olá ! Seu pagamento foi aprovado com sucesso.</p>
 
         <table style="width:100%;border-collapse:collapse;margin:20px 0">
           <thead>

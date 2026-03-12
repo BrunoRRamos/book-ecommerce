@@ -216,7 +216,7 @@ export default function CartPage() {
         <div className="flex-1" />
         <Button
           type="primary"
-          disabled={!cartItems.length}
+          disabled={!cartItems.length || !freteSelecionado}
           loading={isPlacing}
           onClick={async () => {
             try {
@@ -256,6 +256,11 @@ export default function CartPage() {
         >
           Finalizar compra
         </Button>
+        {cartItems.length > 0 && !freteSelecionado && (
+          <span className="text-xs text-amber-500">
+            Calcule o frete para continuar
+          </span>
+        )}
       </section>
 
       <Divider className="p-4" />
