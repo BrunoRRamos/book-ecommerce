@@ -36,7 +36,9 @@ function renderMessage(log: ActivityLog) {
   if (log.type === "ORDER_CREATED" && log.orderId != null) {
     return (
       <>
-        Cliente realizou uma nova compra{" "}
+        Cliente{" "}
+        <strong>{log.customerName ?? "desconhecido"}</strong> realizou uma nova
+        compra{" "}
         <Link
           href={`/orders-management?orderId=${log.orderId}`}
           className="text-blue-600 hover:underline"

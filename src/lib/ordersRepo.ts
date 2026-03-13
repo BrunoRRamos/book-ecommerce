@@ -39,6 +39,6 @@ export function createOrder(input: Omit<Order, "id">): Order {
     id: nextId(orders),
   };
   writeAll([created, ...orders]);
-  logOrderCreated(created.id);
+  logOrderCreated(created.id, created.customerName);
   return created;
 }

@@ -62,10 +62,11 @@ export function logProductDeleted(productName: string) {
   });
 }
 
-export function logOrderCreated(orderId: number) {
+export function logOrderCreated(orderId: number, customerName: string) {
   addActivityLog({
     type: "ORDER_CREATED",
     orderId,
+    customerName,
     createdAt: new Date().toISOString(),
   });
 }
