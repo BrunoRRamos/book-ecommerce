@@ -73,15 +73,6 @@ export default function OrdersManagementPage() {
     <main className="max-w-5xl mx-auto p-6 flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Gestão de Pedidos</h1>
-
-        <div className="flex items-center gap-4">
-          <Link href="/activity-logs" className="text-blue-600 hover:underline">
-            Registro de Atividades
-          </Link>
-          <Link href="/products" className="text-blue-600 hover:underline">
-            Ver produtos
-          </Link>
-        </div>
       </div>
 
       {orders.length === 0 ? (

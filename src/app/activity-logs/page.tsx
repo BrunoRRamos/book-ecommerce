@@ -70,12 +70,6 @@ export default function ActivityLogsPage() {
     <main className="max-w-4xl mx-auto p-6 flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">Registro de Atividades</h1>
-        <Link
-          href="/orders-management"
-          className="text-blue-600 hover:underline"
-        >
-          Gestão de pedidos
-        </Link>
       </div>
 
       {!hasLogs ? (
