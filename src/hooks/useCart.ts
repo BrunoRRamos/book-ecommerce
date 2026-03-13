@@ -11,7 +11,7 @@ export function useCart() {
     const storedData = localStorage.getItem("cartItems");
     setCartItem(storedData ? JSON.parse(storedData) : []);
     setIsMounted(true);
-  }, []);
+  }, []);''
 
   useEffect(() => {
     if (!isMounted) return;

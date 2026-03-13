@@ -54,8 +54,9 @@ export function ensureSeededProducts() {
       imagem: "https://storage.googleapis.com/propcart-br.appspot.com/images%2Fitems%2FZDo2UPcBdzhr1CniYN8i_1684855933547.jpg",
       preco: 45.99,
       categoria: "Ficção",
-      tags: ["sci-fi", "aventura"],
+      tags: ["sci-fi", "aventura", "ebook"],
       estoque: 10,
+      isEbook: true,
     },
     {
       id: 2,
@@ -64,8 +65,9 @@ export function ensureSeededProducts() {
       imagem: "https://static.wixstatic.com/media/cfa9bb_c40940ebf34343a0bb4ada95cdc58ed2~mv2.jpg/v1/fill/w_420,h_549,al_c,lg_1,q_80/cfa9bb_c40940ebf34343a0bb4ada95cdc58ed2~mv2.jpg",
       preco: 35.5,
       categoria: "Culinária",
-      tags: ["receitas", "brasil"],
+      tags: ["receitas", "brasil", "ebook"],
       estoque: 10,
+      isEbook: true,
     },
     {
       id: 3,
@@ -76,6 +78,7 @@ export function ensureSeededProducts() {
       categoria: "Tecnologia",
       tags: ["javascript", "web"],
       estoque: 10,
+      isEbook: true,
     },
     {
       id: 4,
@@ -86,6 +89,7 @@ export function ensureSeededProducts() {
       categoria: "Romance",
       tags: ["mistério", "suspense"],
       estoque: 10,
+      isEbook: true,
     },
   ];
 
@@ -105,7 +109,7 @@ export function getProduct(id: number): Product | null {
 
 export function createProduct(input: ProductInput): Product {
   const products = readAll();
-  const created: Product = { ...input, id: nextId(products) };
+  const created: Product = { ...input, id: nextId(products), isEbook: true };
   const next = [created, ...products];
   writeAll(next);
   logProductCreated(created.nome);
@@ -118,7 +122,7 @@ export function updateProduct(id: number, input: ProductInput): Product {
   if (idx < 0) {
     throw new Error("Product not found");
   }
-  const updated: Product = { ...input, id };
+  const updated: Product = { ...input, id, isEbook: true };
   const next = [...products];
   next[idx] = updated;
   writeAll(next);

@@ -7,7 +7,11 @@ import {
   decrementInventory,
   ensureSeededProducts,
 } from "@/src/lib/productsRepo";
-import { PaymentMethod, ShippingStatus } from "@/src/types/types";
+import {
+  PaymentMethod,
+  ShipmentType,
+  ShippingStatus,
+} from "@/src/types/types";
 import { formatCurrency } from "@/src/utils/utils";
 import {
   Button,
@@ -68,6 +72,12 @@ type EnderecoViaCep = {
   uf: string;
 };
 
+const RETIRADA_NO_ESTABELECIMENTO: FreteOption = {
+  servico: "Retirar no estabelecimento",
+  prazo: "",
+  preco: 0,
+};
+
 async function buscarCoordenadasPorCidade(
   cidade: string,
   uf: string,
@@ -105,6 +115,9 @@ export default function CartPage() {
   const { cartItems, setItemQuantity, removeCartItem, clearCart } = useCart();
   const [total, setTotal] = useState<number>(0);
   const [isPlacing, setIsPlacing] = useState(false);
+  const [opcaoEntrega, setOpcaoEntrega] = useState<ShipmentType>(
+    ShipmentType.PICKUP,
+  );
   const [metodoPagamento, setMetodoPagamento] = useState<PaymentMethod>(
     PaymentMethod.CARD,
   );
@@ -117,7 +130,7 @@ export default function CartPage() {
   const [distanciaKm, setDistanciaKm] = useState<number | null>(null);
   const [freteOpcoes, setFreteOpcoes] = useState<FreteOption[]>([]);
   const [freteSelecionado, setFreteSelecionado] = useState<FreteOption | null>(
-    null,
+    RETIRADA_NO_ESTABELECIMENTO,
   );
   const [freteErro, setFreteErro] = useState("");
   const [customerName, setCustomerName] = useState(() => {
@@ -145,6 +158,7 @@ export default function CartPage() {
         nome: i.nome,
         preco: i.preco,
         quantity: i.quantity,
+        isEbook: i.isEbook,
       }));
 
       if (freteSelecionado && freteSelecionado.preco > 0) {
@@ -152,6 +166,7 @@ export default function CartPage() {
           nome: `Frete - ${freteSelecionado.servico} (${freteSelecionado.prazo})`,
           preco: freteSelecionado.preco,
           quantity: 1,
+          isEbook: false,
         });
       }
 
@@ -264,7 +279,7 @@ export default function CartPage() {
 
         <span>
           Total: {formatCurrency(totalComFrete)}
-          {freteSelecionado && (
+          {freteSelecionado && freteSelecionado.preco > 0 && (
             <span className="text-xs text-gray-400 ml-1">
               (incl. frete {freteSelecionado.servico})
             </span>
@@ -292,6 +307,39 @@ export default function CartPage() {
                 ),
               }),
             )}
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">Entrega:</span>
+          <Select
+            value={opcaoEntrega}
+            style={{ width: 220 }}
+            disabled={cartItems.length == 0}
+            onChange={(value: ShipmentType) => {
+              setOpcaoEntrega(value);
+
+              if (value === ShipmentType.PICKUP) {
+                setFreteSelecionado(RETIRADA_NO_ESTABELECIMENTO);
+                setFreteOpcoes([]);
+                setEndereco(null);
+                setDistanciaKm(null);
+                setFreteErro("");
+                setCep("");
+              } else {
+                setFreteSelecionado(null);
+              }
+            }}
+            options={[
+              {
+                value: ShipmentType.PICKUP,
+                label: "Retirar no estabelecimento",
+              },
+              {
+                value: ShipmentType.HOME_DELIVERY,
+                label: "Entregar na minha casa",
+              },
+            ]}
           />
         </div>
 
@@ -337,10 +385,12 @@ export default function CartPage() {
                   nome: i.nome,
                   preco: i.preco,
                   quantity: i.quantity,
+                  isEbook: i.isEbook,
                 })),
                 shippingStatus: ShippingStatus.SENT,
                 paymentMethod: metodoPagamento,
                 customerName: customerName.trim(),
+                shipmentType: opcaoEntrega,
               });
 
               notification.success({
@@ -400,83 +450,99 @@ export default function CartPage() {
                 onChange={(e) => setCustomerName(e.target.value)}
               />
             </div>
-
-            <Divider className="my-2" />
-
-            <div className="flex items-center gap-2">
-              <Truck size={16} className="text-gray-600" />
-              <span className="font-semibold text-gray-800">
-                Simule seu frete
-              </span>
-            </div>
-
-            <div className="flex gap-2">
-              <Input
-                placeholder="00000-000"
-                value={cep}
-                onChange={handleCepChange}
-                onPressEnter={handleCalcularFrete}
-                className="flex-1"
-                maxLength={9}
-                status={freteErro ? "error" : ""}
-              />
-            </div>
-
-            <Button
-              type="primary"
-              icon={<Search size={14} />}
-              onClick={handleCalcularFrete}
-              loading={loadingFrete}
-              disabled={cep.replace(/\D/g, "").length !== 8}
-            >
-              Atualizar
-            </Button>
-
-            {freteErro && <p className="text-xs text-red-500">{freteErro}</p>}
-
-            {loadingFrete && (
-              <div className="flex justify-center py-2">
-                <Spin size="small" />
-              </div>
+            {opcaoEntrega === ShipmentType.PICKUP && (
+              <p className="text-sm text-gray-600">
+                Retirar no estabelecimento selecionado. Nenhum frete será cobrado.
+              </p>
             )}
 
-            {endereco && !loadingFrete && (
-              <div className="bg-gray-50 rounded p-2 text-xs text-gray-600">
-                <p className="font-medium text-gray-700">
-                  {endereco.localidade} - {endereco.uf}
-                </p>
-              </div>
-            )}
-
-            {freteOpcoes.length > 0 && !loadingFrete && (
+            {opcaoEntrega === ShipmentType.HOME_DELIVERY && (
               <>
-                <Divider className="my-1" />
+                <Divider className="my-2" />
 
-                <Radio.Group
-                  value={freteSelecionado?.servico}
-                  onChange={(e) =>
-                    setFreteSelecionado(
-                      freteOpcoes.find((o) => o.servico === e.target.value) ??
-                        null,
-                    )
-                  }
-                  className="flex flex-col gap-2"
+                <div className="flex items-center gap-2">
+                  <Truck size={16} className="text-gray-600" />
+                  <span className="font-semibold text-gray-800">
+                    Simule seu frete
+                  </span>
+                </div>
+
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="00000-000"
+                    value={cep}
+                    onChange={handleCepChange}
+                    onPressEnter={handleCalcularFrete}
+                    className="flex-1"
+                    maxLength={9}
+                    status={freteErro ? "error" : ""}
+                  />
+                </div>
+
+                <Button
+                  type="primary"
+                  icon={<Search size={14} />}
+                  onClick={handleCalcularFrete}
+                  loading={loadingFrete}
+                  disabled={cep.replace(/\D/g, "").length !== 8}
                 >
-                  {freteOpcoes.map((opcao) => (
-                    <Radio key={opcao.servico} value={opcao.servico}>
-                      <div className="flex justify-between items-center w-48">
-                        <div>
-                          <p className="text-sm font-medium">{opcao.servico}</p>
-                          <p className="text-xs text-gray-400">{opcao.prazo}</p>
-                        </div>
+                  Atualizar
+                </Button>
 
-                        <span className="text-sm font-semibold text-gray-700">
-                          {formatCurrency(opcao.preco)}
-                        </span>
-                      </div>
-                    </Radio>
-                  ))}
-                </Radio.Group>
+                {freteErro && (
+                  <p className="text-xs text-red-500">{freteErro}</p>
+                )}
+
+                {loadingFrete && (
+                  <div className="flex justify-center py-2">
+                    <Spin size="small" />
+                  </div>
+                )}
+
+                {endereco && !loadingFrete && (
+                  <div className="bg-gray-50 rounded p-2 text-xs text-gray-600">
+                    <p className="font-medium text-gray-700">
+                      {endereco.localidade} - {endereco.uf}
+                    </p>
+                  </div>
+                )}
+
+                {freteOpcoes.length > 0 && !loadingFrete && (
+                  <>
+                    <Divider className="my-1" />
+
+                    <Radio.Group
+                      value={freteSelecionado?.servico}
+                      onChange={(e) =>
+                        setFreteSelecionado(
+                          freteOpcoes.find(
+                            (o) => o.servico === e.target.value,
+                          ) ?? null,
+                        )
+                      }
+                      className="flex flex-col gap-2"
+                    >
+                      {freteOpcoes.map((opcao) => (
+                        <Radio key={opcao.servico} value={opcao.servico}>
+                          <div className="flex justify-between items-center w-48">
+                            <div>
+                              <p className="text-sm font-medium">
+                                {opcao.servico}
+                              </p>
+                              <p className="text-xs text-gray-400">
+                                {opcao.prazo}
+                              </p>
+                            </div>
+
+                            <span className="text-sm font-semibold text-gray-700">
+                              {formatCurrency(opcao.preco)}
+                            </span>
+                          </div>
+                        </Radio>
+                      ))}
+                    </Radio.Group>
+                  </>
+                )}
               </>
             )}
           </div>
