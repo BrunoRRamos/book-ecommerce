@@ -26,6 +26,7 @@ import {
 import { Search, Truck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/src/app/auth/AuthContext";
 
 const ORIGEM = { lat: -7.2306, lng: -35.8811 };
 const PRECO_POR_KM = 0.1;
@@ -110,6 +111,7 @@ export default function CartPage() {
   );
 
   const router = useRouter();
+  const { role } = useAuth();
 
   const [cep, setCep] = useState("");
   const [loadingFrete, setLoadingFrete] = useState(false);
@@ -124,6 +126,12 @@ export default function CartPage() {
     if (typeof window === "undefined") return "";
     return window.localStorage.getItem("currentCustomerName") ?? "";
   });
+
+  useEffect(() => {
+    if (role === "admin") {
+      router.replace("/products");
+    }
+  }, [role, router]);
 
   useEffect(() => {
     setTotal(
