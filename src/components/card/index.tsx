@@ -45,6 +45,7 @@ export function Card(props: CardProps) {
     nome,
     preco,
     quantity: 1,
+    isEbook: tags?.includes("ebook"),
   };
 
   const onAddItem = (id: number) => {

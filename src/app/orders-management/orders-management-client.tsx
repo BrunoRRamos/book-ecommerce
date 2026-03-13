@@ -1,7 +1,12 @@
 "use client";
 
 import { listOrders } from "@/src/lib/ordersRepo";
-import { Order, PaymentMethod, ShippingStatus } from "@/src/types/types";
+import {
+  Order,
+  PaymentMethod,
+  ShipmentType,
+  ShippingStatus,
+} from "@/src/types/types";
 import { formatCurrency } from "@/src/utils/utils";
 import { Divider, Tag, Steps, Collapse } from "antd";
 import Link from "next/link";
@@ -10,6 +15,8 @@ import {
   CreditCardOutlined,
   DollarOutlined,
   FileDoneOutlined,
+  TruckOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import { useAuth } from "@/src/app/auth/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -49,6 +56,12 @@ export function OrdersManagementClient() {
     title: s.title,
   }));
 
+  const pickupStepsItems = [
+    { title: "Pedido recebido" },
+    { title: "Pronto para retirada" },
+    { title: "Coletado" },
+  ];
+
   useEffect(() => {
     if (role !== "admin") {
       router.replace("/admin-login");
@@ -85,86 +98,114 @@ export function OrdersManagementClient() {
           ghost
           defaultActiveKey={orders[0]?.id}
           className="flex flex-col gap-4"
-          items={orders.map((order) => ({
-            key: order.id,
+          items={orders.map((order) => {
+            const shipment = order.shipmentType ?? ShipmentType.PICKUP;
+            const stepsForOrder =
+              shipment === ShipmentType.PICKUP ? pickupStepsItems : stepsItems;
+            const currentStepIndex = Math.min(
+              ShippingStatusInfo[order.shippingStatus].index,
+              stepsForOrder.length - 1,
+            );
 
-            label: (
-              <div className="flex justify-between items-center w-full pr-4 py-3">
-                {/* Left */}
-                <div className="flex flex-col">
-                  <span className="text-lg font-semibold">
-                    Pedido #{order.id}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    Cliente: {order.customerName || "Cliente desconhecido"}
-                  </span>
+            return {
+              key: order.id,
+              label: (
+                <div className="flex justify-between items-center w-full pr-4 py-3">
+                  {/* Left */}
+                  <div className="flex flex-col">
+                    <span className="text-lg font-semibold">
+                      Pedido #{order.id}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      Cliente: {order.customerName || "Cliente desconhecido"}
+                    </span>
 
-                  <span className="text-sm text-gray-500">
-                    {new Date(order.createdAt).toLocaleString("pt-BR")}
-                  </span>
-                </div>
+                    <span className="text-sm text-gray-500">
+                      {new Date(order.createdAt).toLocaleString("pt-BR")}
+                    </span>
+                  </div>
 
-                {/* Right */}
-                <div className="flex items-center gap-2">
-                  <Tag
-                    color={PaymentMethodFormatter[order.paymentMethod].color}
-                    className="text-sm px-3 py-1 flex items-center gap-1"
-                  >
-                    {PaymentMethodFormatter[order.paymentMethod].icon}{" "}
-                    {PaymentMethodFormatter[order.paymentMethod].title}
-                  </Tag>
-
-                  <Tag color="blue" className="text-sm px-3 py-1">
-                    {formatCurrency(order.total)}
-                  </Tag>
-                </div>
-              </div>
-            ),
-
-            children: (
-              <div className="flex flex-col gap-5 pt-2">
-                {/* Tracking */}
-                <div className="px-2">
-                  <Steps
-                    current={ShippingStatusInfo[order.shippingStatus].index}
-                    items={stepsItems}
-                    size="small"
-                  />
-                </div>
-
-                <Divider className="my-1" />
-
-                {/* Products */}
-                <div className="flex flex-col gap-3">
-                  {order.items.map((item) => (
-                    <div
-                      key={`${order.id}-${item.productId}`}
-                      className="flex items-center justify-between text-sm"
+                  {/* Right */}
+                  <div className="flex items-center gap-2">
+                    <Tag
+                      color={
+                        (order.shipmentType ?? ShipmentType.PICKUP) ===
+                        ShipmentType.HOME_DELIVERY
+                          ? "geekblue"
+                          : "pink"
+                      }
+                      className="text-sm px-3 py-1 flex items-center gap-1"
                     >
-                      <div className="flex flex-col">
-                        <Link
-                          href={`/products/${item.productId}`}
-                          className="font-medium hover:text-blue-600"
-                        >
-                          {item.nome}
-                        </Link>
+                      {(order.shipmentType ?? ShipmentType.PICKUP) ===
+                      ShipmentType.HOME_DELIVERY ? (
+                        <>
+                          <TruckOutlined /> Entregar em minha casa
+                        </>
+                      ) : (
+                        <>
+                          <UserOutlined /> Retirar no estabelecimento
+                        </>
+                      )}
+                    </Tag>
 
-                        <span className="text-gray-500 text-xs">
-                          {item.quantity} × {formatCurrency(item.preco)}
+                    <Tag
+                      color={PaymentMethodFormatter[order.paymentMethod].color}
+                      className="text-sm px-3 py-1 flex items-center gap-1"
+                    >
+                      {PaymentMethodFormatter[order.paymentMethod].icon}{" "}
+                      {PaymentMethodFormatter[order.paymentMethod].title}
+                    </Tag>
+
+                    <Tag color="blue" className="text-sm px-3 py-1">
+                      {formatCurrency(order.total)}
+                    </Tag>
+                  </div>
+                </div>
+              ),
+              children: (
+                <div className="flex flex-col gap-5 pt-2">
+                  {/* Tracking */}
+                  <div className="px-2">
+                    <Steps
+                      current={currentStepIndex}
+                      items={stepsForOrder}
+                      size="small"
+                    />
+                  </div>
+
+                  <Divider className="my-1" />
+
+                  {/* Products */}
+                  <div className="flex flex-col gap-3">
+                    {order.items.map((item) => (
+                      <div
+                        key={`${order.id}-${item.productId}`}
+                        className="flex items-center justify-between text-sm"
+                      >
+                        <div className="flex flex-col">
+                          <Link
+                            href={`/products/${item.productId}`}
+                            className="font-medium hover:text-blue-600"
+                          >
+                            {item.nome}
+                          </Link>
+
+                          <span className="text-gray-500 text-xs">
+                            {item.quantity} × {formatCurrency(item.preco)}
+                          </span>
+                        </div>
+
+                        <span className="font-semibold">
+                          {formatCurrency(item.preco * item.quantity)}
                         </span>
                       </div>
-
-                      <span className="font-semibold">
-                        {formatCurrency(item.preco * item.quantity)}
-                      </span>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ),
-
-            className: "bg-white shadow-lg",
-          }))}
+              ),
+              className: "bg-white shadow-lg",
+            };
+          })}
         />
       )}
     </main>

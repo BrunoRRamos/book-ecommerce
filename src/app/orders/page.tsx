@@ -125,9 +125,14 @@ export default function OrdersPage() {
                       >
                         {it.nome}
                       </Link>
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs text-gray-600 block">
                         {it.quantity} x {formatCurrency(it.preco)}
                       </span>
+                      {it.isEbook && (
+                        <span className="text-xs text-blue-600 underline cursor-pointer">
+                          Baixar ebook
+                        </span>
+                      )}
                     </div>
                     <span className="font-semibold">
                       {formatCurrency(it.preco * it.quantity)}

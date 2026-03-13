@@ -3,6 +3,7 @@ export interface CartItem {
   nome: string;
   preco: number;
   quantity: number;
+  isEbook?: boolean;
 }
 
 export interface CartItemRowProps extends CartItem {
@@ -39,6 +40,7 @@ export interface Product {
   categoria: string;
   tags: string[];
   estoque: number;
+  isEbook?: boolean;
 }
 
 export type NotificationType = "success" | "info" | "warning" | "error";
@@ -48,6 +50,7 @@ export interface OrderLine {
   nome: string;
   preco: number;
   quantity: number;
+  isEbook?: boolean;
 }
 
 export enum ShippingStatus {
@@ -55,6 +58,11 @@ export enum ShippingStatus {
   ON_THE_WAY = "on_the_way",
   SHIPPING_ROUTE = "shipping_route",
   DELIVERED = "delivered",
+}
+
+export enum ShipmentType {
+  PICKUP = "pickup",
+  HOME_DELIVERY = "home_delivery",
 }
 
 export enum PaymentMethod {
@@ -71,6 +79,7 @@ export interface Order {
   shippingStatus: ShippingStatus;
   paymentMethod: PaymentMethod;
   customerName: string;
+  shipmentType: ShipmentType;
 }
 
 export type ActivityLogType =
